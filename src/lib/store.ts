@@ -4,9 +4,9 @@ import {
   configureStore,
   ThunkAction,
 } from "@reduxjs/toolkit";
-import { counterSlice } from "./features/user/userSlice";
+import { authenticationSlice } from "./features/authentication/authenticationSlice";
 
-const rootReducer = combineSlices(counterSlice);
+const rootReducer = combineSlices(authenticationSlice);
 
 export const makeStore = () => {
   return configureStore({
@@ -21,7 +21,6 @@ export const makeStore = () => {
 
 // Infer the type of makeStore
 export type AppStore = ReturnType<typeof makeStore>;
-// Infer the `RootState` and `AppDispatch` types from the store itself
 export type RootState = ReturnType<typeof rootReducer>;
 export type AppDispatch = AppStore["dispatch"];
 

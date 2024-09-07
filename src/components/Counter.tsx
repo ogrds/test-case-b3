@@ -10,7 +10,7 @@ import {
   incrementIfOdd,
   selectCount,
   selectStatus,
-} from "@/lib/features/user/userSlice";
+} from "@/lib/features/authentication/userSlice";
 
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 

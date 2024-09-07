@@ -29,6 +29,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useAppDispatch } from "@/lib/hooks";
+import { signIn } from "@/lib/features/authentication/authenticationSlice";
+import { useRouter } from "next/navigation";
+import { Loader2 } from "lucide-react";
 
 export const description =
   "A sign up form with first name, last name, email and password inside a card. There's an option to sign up with GitHub and a link to login if you already have an account";
@@ -61,14 +65,36 @@ const formSchema = z.object({
 
 type FormSchema = z.infer<typeof formSchema>;
 
-export function LoginForm() {
+export function SignupForm() {
+  const dispatch = useAppDispatch();
+
+  const router = useRouter();
+
   const form = useForm<FormSchema>({
     resolver: zodResolver(formSchema),
   });
 
+  async function handleSubmit(data: FormSchema) {
+    try {
+      await dispatch(
+        signIn({
+          email: data.email,
+          password: data.password,
+          country: data.country,
+          firstName: data["first-name"],
+          lastName: data["last-name"],
+        })
+      );
+
+      router.push("/");
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(console.log, console.log)}>
+      <form onSubmit={form.handleSubmit(handleSubmit)}>
         <Card className="mx-auto max-w-sm">
           <CardHeader>
             <CardTitle className="text-xl">Sign Up</CardTitle>
@@ -113,6 +139,35 @@ export function LoginForm() {
               <div className="grid gap-2">
                 <FormField
                   control={form.control}
+                  name="country"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Country</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select your country" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {Object.entries(countries).map(([code, { name }]) => (
+                            <SelectItem key={code} value={code}>
+                              {name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+              <div className="grid gap-2">
+                <FormField
+                  control={form.control}
                   name="email"
                   render={({ field }) => (
                     <FormItem>
@@ -144,36 +199,15 @@ export function LoginForm() {
                   )}
                 />
               </div>
-              <div className="grid gap-2">
-                <FormField
-                  control={form.control}
-                  name="country"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Country</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select your country" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {Object.entries(countries).map(([code, { name }]) => (
-                            <SelectItem key={code} value={code}>
-                              {name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
+              <Button
+                disabled={form.formState.isSubmitting}
+                type="submit"
+                className="w-full"
+              >
+                <Loader2
+                  data-loading={form.formState.isSubmitting}
+                  className="hidden mr-2 h-4 w-4 animate-spin data-[loading=true]:block"
                 />
-              </div>
-              <Button type="submit" className="w-full">
                 Create an account
               </Button>
             </div>
