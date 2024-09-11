@@ -10,10 +10,10 @@ export const availableThemes = {
   dark,
   "theme-orange": {
     ...themeOrange,
-    name: "Orange",
+    name: "Laranja",
   },
   "theme-blue": {
     ...themeBlue,
-    name: "Blue",
+    name: "Azul",
   },
 };

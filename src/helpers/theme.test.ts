@@ -3,7 +3,7 @@ import { CUSTOM_THEME_PREFIX } from "@/lib/constants";
 import { AvailableThemes } from "@/styles/themes";
 
 describe("getThemeValue", () => {
-  const customTheme: AvailableThemes = "customTheme";
+  const customTheme = "customTheme" as AvailableThemes;
 
   it("should return customTheme when theme is 'system' and systemTheme is 'light'", () => {
     const result = getThemeValue({
@@ -11,6 +11,7 @@ describe("getThemeValue", () => {
       systemTheme: "light",
       customTheme,
     });
+
     expect(result).toBe(customTheme);
   });
 
@@ -36,16 +37,17 @@ describe("getThemeValue", () => {
     expect(result).toBe(customTheme);
   });
 
-  it("should return 'dark' when theme includes CUSTOM_THEME_PREFIX and '__'", () => {
+  it("should return 'dark_customTheme' when theme includes CUSTOM_THEME_PREFIX and '__'", () => {
     const result = getThemeValue({
       theme: `${CUSTOM_THEME_PREFIX}__theme`,
       customTheme,
     });
-    expect(result).toBe("dark");
+    expect(result).toBe(`dark__${customTheme}`);
   });
 
   it("should return customTheme when theme is 'light'", () => {
     const result = getThemeValue({ theme: "light", customTheme });
+
     expect(result).toBe(customTheme);
   });
 });

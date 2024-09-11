@@ -1,7 +1,6 @@
 "use client";
 
 import { countries } from "countries-list";
-import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -33,34 +32,33 @@ import { useAppDispatch } from "@/lib/hooks";
 import { signIn } from "@/lib/features/authentication/authenticationSlice";
 import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
-
-export const description =
-  "A sign up form with first name, last name, email and password inside a card. There's an option to sign up with GitHub and a link to login if you already have an account";
+import { LoginDialog } from "../login-dialog";
+import { useToast } from "@/hooks/use-toast";
 
 const formSchema = z.object({
-  "first-name": z
+  firstName: z
     .string({
-      required_error: "First name is required",
+      required_error: "Nome é obrigatório",
     })
-    .min(1, "First name is required"),
-  "last-name": z
+    .min(1, "Nome é obrigatório"),
+  lastName: z
     .string({
-      required_error: "Last name is required",
+      required_error: "Sobrenome é obrigatório",
     })
-    .min(1, "Last name is required"),
+    .min(1, "Sobrenome é obrigatório"),
   country: z.string({
-    required_error: "Please select your country.",
+    required_error: "Por favor, selecione seu país.",
   }),
   email: z
     .string({
-      required_error: "Please enter your email.",
+      required_error: "Por favor, insira seu e-mail.",
     })
     .email(),
   password: z
     .string({
-      required_error: "Please enter your password.",
+      required_error: "Por favor, insira sua senha.",
     })
-    .min(6, "Password must be at least 6 characters."),
+    .min(6, "A senha deve ter no mínimo 6 caracteres."),
 });
 
 type FormSchema = z.infer<typeof formSchema>;
@@ -68,6 +66,7 @@ type FormSchema = z.infer<typeof formSchema>;
 export function SignupForm() {
   const dispatch = useAppDispatch();
 
+  const { toast } = useToast();
   const router = useRouter();
 
   const form = useForm<FormSchema>({
@@ -81,39 +80,112 @@ export function SignupForm() {
           email: data.email,
           password: data.password,
           country: data.country,
-          firstName: data["first-name"],
-          lastName: data["last-name"],
+          firstName: data.firstName,
+          lastName: data.lastName,
         })
       );
 
       router.push("/");
     } catch (error) {
-      console.error(error);
+      let message = "Ocorreu um erro ao cadastrar";
+      if (error instanceof Error) message = error.message;
+      toast({
+        variant: "destructive",
+        description: message,
+        duration: 2000,
+      });
     }
   }
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSubmit)}>
-        <Card className="mx-auto max-w-sm">
-          <CardHeader>
-            <CardTitle className="text-xl">Sign Up</CardTitle>
-            <CardDescription>
-              Enter your information to create an account
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid gap-4">
-              <div className="grid grid-cols-2 gap-4">
+    <div>
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(handleSubmit)}>
+          <Card className="mx-auto max-w-sm">
+            <CardHeader>
+              <CardTitle className="text-xl">Cadastro</CardTitle>
+              <CardDescription>
+                Insira suas informações para criar uma conta
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid gap-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="grid gap-2">
+                    <FormField
+                      control={form.control}
+                      name="firstName"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Nome</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Jhon" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <FormField
+                      control={form.control}
+                      name="lastName"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Sobrenome</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Doe" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                </div>
                 <div className="grid gap-2">
                   <FormField
                     control={form.control}
-                    name="first-name"
+                    name="country"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>First Name</FormLabel>
+                        <FormLabel>País</FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
+                          <FormControl>
+                            <SelectTrigger aria-label="Country">
+                              <SelectValue placeholder="Selecione seu país" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {Object.entries(countries).map(
+                              ([code, { name }]) => (
+                                <SelectItem key={code} value={code}>
+                                  {name}
+                                </SelectItem>
+                              )
+                            )}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <FormField
+                    control={form.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>E-Mail</FormLabel>
                         <FormControl>
-                          <Input placeholder="Jonathan" {...field} />
+                          <Input
+                            type="email"
+                            placeholder="jhon.doe@example.com"
+                            {...field}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -123,103 +195,47 @@ export function SignupForm() {
                 <div className="grid gap-2">
                   <FormField
                     control={form.control}
-                    name="last-name"
+                    name="password"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Last Name</FormLabel>
+                        <FormLabel>Senha</FormLabel>
                         <FormControl>
-                          <Input placeholder="Calleri" {...field} />
+                          <Input
+                            placeholder="******"
+                            type="password"
+                            {...field}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
                 </div>
+                <Button
+                  disabled={form.formState.isSubmitting}
+                  type="submit"
+                  className="w-full"
+                >
+                  <Loader2
+                    data-loading={form.formState.isSubmitting}
+                    className="hidden mr-2 h-4 w-4 animate-spin data-[loading=true]:block"
+                  />
+                  Criar conta
+                </Button>
               </div>
-              <div className="grid gap-2">
-                <FormField
-                  control={form.control}
-                  name="country"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Country</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select your country" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {Object.entries(countries).map(([code, { name }]) => (
-                            <SelectItem key={code} value={code}>
-                              {name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-              <div className="grid gap-2">
-                <FormField
-                  control={form.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>E-Mail</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="email"
-                          placeholder="calleri@spfc.net"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-              <div className="grid gap-2">
-                <FormField
-                  control={form.control}
-                  name="password"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Password</FormLabel>
-                      <FormControl>
-                        <Input type="password" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-              <Button
-                disabled={form.formState.isSubmitting}
-                type="submit"
-                className="w-full"
-              >
-                <Loader2
-                  data-loading={form.formState.isSubmitting}
-                  className="hidden mr-2 h-4 w-4 animate-spin data-[loading=true]:block"
-                />
-                Create an account
-              </Button>
-            </div>
-            <div className="mt-4 text-center text-sm">
-              Already have an account?{" "}
-              <Link href="initial" className="underline">
-                Sign in
-              </Link>
-            </div>
-          </CardContent>
-        </Card>
-      </form>
-    </Form>
+            </CardContent>
+          </Card>
+        </form>
+      </Form>
+
+      <div className="mt-4 text-center text-sm">
+        Já tem uma conta?{" "}
+        <LoginDialog>
+          <Button variant="link" className="underline p-0">
+            Acessar
+          </Button>
+        </LoginDialog>
+      </div>
+    </div>
   );
 }

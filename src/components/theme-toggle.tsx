@@ -16,8 +16,18 @@ import {
 import { availableThemes, type AvailableThemes } from "@/styles/themes";
 import { CUSTOM_THEME_PREFIX } from "@/lib/constants";
 import { getThemeValue } from "@/helpers/theme";
+import { useAppDispatch, useAppSelector } from "@/lib/hooks";
+import {
+  changeTheme,
+  selectUser,
+  selectUserTheme,
+} from "@/lib/features/authentication/authenticationSlice";
 
 export function ModeToggle() {
+  const dispatch = useAppDispatch();
+  const user = useAppSelector(selectUser);
+  const userTheme = useAppSelector(selectUserTheme);
+
   const { theme, setTheme, systemTheme } = useTheme();
 
   const customThemes = React.useMemo(() => {
@@ -33,8 +43,15 @@ export function ModeToggle() {
       customTheme,
     });
 
+    dispatch(changeTheme(customThemeKey));
     setTheme(customThemeKey);
   }
+
+  React.useEffect(() => {
+    if (user && userTheme) {
+      setTheme(userTheme);
+    }
+  }, [user, userTheme, setTheme]);
 
   return (
     <DropdownMenu>
@@ -47,18 +64,18 @@ export function ModeToggle() {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuItem onClick={() => setTheme("light")}>
-          Light
+          Claro
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => setTheme("dark")}>
-          Dark
+          Escuro
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => setTheme("system")}>
-          System
+          Sistema
         </DropdownMenuItem>
 
         <DropdownMenuSeparator />
 
-        <DropdownMenuLabel>Color Theme</DropdownMenuLabel>
+        <DropdownMenuLabel>Cor principal</DropdownMenuLabel>
         {customThemes.map((theme) => (
           <DropdownMenuItem key={theme} onClick={() => setCustomTheme(theme)}>
             <div className="flex items-center gap-2">

@@ -6,6 +6,7 @@ import StoreProvider from "@/providers/store-provider";
 import { ThemeProvider } from "@/providers/theme-provider";
 
 import { availableThemes } from "@/styles/themes";
+import { Toaster } from "@/components/ui/toaster";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
@@ -29,6 +30,7 @@ export default function RootLayout({
     <StoreProvider>
       <html lang="en">
         <body className={`${inter.className} antialiased`}>
+          <Toaster />
           <ThemeProvider
             themes={Object.keys(availableThemes) ?? []}
             attribute="data-theme"
