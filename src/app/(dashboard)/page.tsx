@@ -36,7 +36,7 @@ export type CurrencyInfo = {
 
 const currency = "BRL";
 
-export const columns: ColumnDef<CurrencyInfo>[] = [
+const columns: ColumnDef<CurrencyInfo>[] = [
   {
     accessorKey: "currency",
     header: ({ column }) => {
