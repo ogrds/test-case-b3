@@ -6,31 +6,26 @@ First, run the development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:4000](http://localhost:4000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+The list of libraries used are:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- `redux` for state management;
+- `jest` for test the components;
+- `tailwindcss` for styles;
+- `shadcn/ui` for designed components and default styling;
 
-## Learn More
+The project have the routes below:
 
-To learn more about Next.js, take a look at the following resources:
+#### Public
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- `/signin`: When the user is not authenticated, he will see this route
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+#### Authenticated
 
-## Deploy on Vercel
+- `/`: The home page of the application, where the user is redirect after register ou login;
+- `/profile`: The page where the user can change their information like name, country, etc;
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+_For this test case, we don't have an API or database to save information. All the user will be saved on localStorage._
